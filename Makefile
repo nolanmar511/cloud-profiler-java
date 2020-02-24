@@ -14,11 +14,9 @@
 
 CC = g++
 
-# Determine the machine type.
-machine_type := $(shell uname -m)
-
 # -fpermissive used to bypass <:: errors from gcc 4.7
 CFLAGS = \
+	-m64 \
 	-std=c++11 \
 	-fpermissive \
 	-fPIC \
@@ -33,23 +31,13 @@ CFLAGS = \
 	-D_GNU_SOURCE \
 	-DENABLE_HEAP_SAMPLING
 
-ifeq ($(machine_type),$(filter $(machine_type),aarch64 arm64))
-  # Building on an ARM64 machine.
-	CFLAGS += \
-		-march=native \
-		-mtune=native \
-		-mcpu=native
-	JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-arm64
-else
-	CFLAGS += -m64
-	JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64
-endif
 ifneq ($(AGENT_VERSION),)
   CFLAGS += -DCLOUD_PROFILER_AGENT_VERSION=\"$(AGENT_VERSION)\"
 endif
 
 SRC_ROOT_PATH=.
 
+JAVA_PATH ?= /usr/lib/jvm/java-11-openjdk-amd64
 PROTOC ?= /usr/local/bin/protoc
 PROTOC_GEN_GRPC ?= /usr/local/bin/grpc_cpp_plugin
 
@@ -185,21 +173,6 @@ GRPC_LIBS= \
 	$(LIB_ROOT_PATH)/lib/libgrpc++.a \
   $(LIB_ROOT_PATH)/lib/libgrpc.a \
   $(LIB_ROOT_PATH)/lib/libgpr.a \
-
-# Detect if running on Alpine and modify various flags
-ifeq ("$(wildcard /etc/alpine-release)","/etc/alpine-release")
-  # musl only supports global dynamic tls model, and is documented as
-  # async-signal-safe. See
-  # https://wiki.musl-libc.org/design-concepts.html#Thread-local-storage
-  # This selects global-dynamic TLS model in
-  # third_party/javaprofiler/accessors.h
-  CFLAGS += -DALPINE
-
-  LIBS1 += /usr/lib/libexecinfo.a
-
-  # libgcc is not installed by default on Alpine.
-  LDFLAGS += -static-libgcc
-endif
 
 all: \
 	$(TARGET_AGENT) \

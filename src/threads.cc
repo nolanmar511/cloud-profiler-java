@@ -27,10 +27,6 @@ namespace {
 const timer_t kInvalidTimer = reinterpret_cast<timer_t>(-1LL);
 
 timer_t CreateTimer(pid_t tid) {
-#ifdef ALPINE
-  // Per thread timers are not available on Alpine.
-  return kInvalidTimer;
-#else
   struct sigevent sevp = {};
   sevp.sigev_notify = SIGEV_THREAD_ID;
   sevp._sigev_un._tid = tid;
@@ -42,7 +38,6 @@ timer_t CreateTimer(pid_t tid) {
     return kInvalidTimer;
   }
   return timer;
-#endif
 }
 
 bool SetTimer(timer_t timer, int64_t period_usec) {

@@ -1,4 +1,4 @@
-Google Cloud Profiler
+Google Stackdriver Profiler
 Copyright Google Inc.
 Use of this software is governed by the Google Cloud Platform Terms of Service
 found at https://cloud.google.com/terms/
@@ -470,3 +470,4 @@ OpenSSL License
  * copied and put under another distribution licence
  * [including the GNU Public Licence.]
  */
+ 

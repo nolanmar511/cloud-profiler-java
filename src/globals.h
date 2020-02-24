@@ -22,11 +22,14 @@
 #include <jni.h>
 #include <jvmti.h>
 #include <stdint.h>
-
 #include <unordered_map>
 
 #include "third_party/javaprofiler/jvmti_error.h"
 #include "third_party/javaprofiler/stacktraces.h"
+
+#ifndef CLOUD_PROFILER_AGENT_VERSION
+#define CLOUD_PROFILER_AGENT_VERSION "unknown"
+#endif
 
 #include <glog/logging.h>
 
@@ -43,10 +46,6 @@ using std::string;  // ALLOW_STD_STRING
   TypeName();                                    \
   DISALLOW_COPY_AND_ASSIGN(TypeName)
 
-#ifndef CLOUD_PROFILER_AGENT_VERSION
-#define CLOUD_PROFILER_AGENT_VERSION "unknown"
-#endif
-
 namespace cloud {
 namespace profiler {
 
@@ -55,17 +54,17 @@ namespace profiler {
 // easier to just re-use the constants this way to keep the code easy to read.
 //
 // Remove this when porting is done.
-using google::javaprofiler::kDeopt;
-using google::javaprofiler::kGcActive;
 using google::javaprofiler::kNativeStackTrace;
 using google::javaprofiler::kNoClassLoad;
-using google::javaprofiler::kNotWalkableFrameJava;
-using google::javaprofiler::kNotWalkableFrameNotJava;
-using google::javaprofiler::kSafepoint;
-using google::javaprofiler::kThreadExit;
-using google::javaprofiler::kUnknownJava;
+using google::javaprofiler::kGcActive;
 using google::javaprofiler::kUnknownNotJava;
+using google::javaprofiler::kNotWalkableFrameNotJava;
+using google::javaprofiler::kUnknownJava;
+using google::javaprofiler::kNotWalkableFrameJava;
 using google::javaprofiler::kUnknownState;
+using google::javaprofiler::kThreadExit;
+using google::javaprofiler::kDeopt;
+using google::javaprofiler::kSafepoint;
 
 using google::javaprofiler::kCallTraceErrorLineNum;
 using google::javaprofiler::kMaxFramesToCapture;
@@ -76,7 +75,7 @@ using google::javaprofiler::JVMPI_CallFrame;
 using google::javaprofiler::JVMPI_CallTrace;
 
 // Gets us around -Wunused-parameter
-#define IMPLICITLY_USE(x) (void)x;
+#define IMPLICITLY_USE(x) (void) x;
 
 #define AGENTEXPORT __attribute__((visibility("default"))) JNIEXPORT
 
